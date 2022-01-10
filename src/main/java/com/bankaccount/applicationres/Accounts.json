@@ -1,0 +1,21 @@
+[ {
+  "login" : "alroj",
+  "password" : "pass321",
+  "accountNumber" : 12345678,
+  "currentBalance" : 310.35,
+  "ownerName" : "Alex",
+  "ownerSurname" : "Rojsman",
+  "creditBalance" : 1000.0,
+  "operationList" : [ "Payment: 100.0", "transfer: 100.0" ],
+  "creditStatus" : true
+}, {
+  "login" : "micbrond",
+  "password" : "pass123",
+  "accountNumber" : 87654321,
+  "currentBalance" : 350.35,
+  "ownerName" : "Michael",
+  "ownerSurname" : "Brondskij",
+  "creditBalance" : 2000.0,
+  "operationList" : [ ],
+  "creditStatus" : true
+} ]
