@@ -58,7 +58,7 @@ public class ModelController {
                 } else {
 
                     //inserting to table users
-                    String insertUsers = "insert into users (login, passwords, accountnumber, username, usersurname) values (?,?,?,?,?)";
+                    String insertUsers = "insert into users (login, passwords, accountnumber, username, usersurname) values (?,?,?,?,?);";
                     try {
                         int number = (int) (Math.random() * 89999999) + 10000000;
                         PreparedStatement preparedStatementUsers = dbConnector.getDbConnection().prepareStatement(insertUsers);
@@ -183,25 +183,25 @@ public class ModelController {
     }
 
 
-    public boolean makePaymentIn(int value, String login) {
+    public boolean makePaymentIn(String value, String login) {
 
         try {
             String payIn = "update accountstatus set currentbalance = currentbalance + '" + value + "' where userid = (select id from users where login = '" + login + "');";
             PreparedStatement preparedStatementPaymentIn = dbConnector.getDbConnection().prepareStatement(payIn);
             preparedStatementPaymentIn.executeUpdate();
-            return true;
+            return writeToHistory(login, value, 1);
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    public boolean makePaymentOut(int value, String login) {
+    public boolean makePaymentOut(String value, String login) {
         try {
             String payOut = "update accountstatus set currentbalance = currentbalance - " + value + " where userid = (select id from users where login = '" + login + "');";
             PreparedStatement preparedStatementPaymentOut = dbConnector.getDbConnection().prepareStatement(payOut);
             preparedStatementPaymentOut.executeUpdate();
-            return true;
+            return writeToHistory(login, value, 2);
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
             return false;
@@ -216,7 +216,7 @@ public class ModelController {
             preparedStatementTransfer.executeUpdate();
             PreparedStatement preparedStatementTransferReceiver = dbConnector.getDbConnection().prepareStatement(transferReceiver);
             preparedStatementTransferReceiver.executeUpdate();
-            return true;
+            return writeToHistory(login, value, 4);
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
             return false;
@@ -231,7 +231,8 @@ public class ModelController {
             preparedStatementCreditStatus.executeUpdate();
             PreparedStatement preparedStatementAccountStatus = dbConnector.getDbConnection().prepareStatement(creditingAccountStatus);
             preparedStatementAccountStatus.executeUpdate();
-            return true;
+            return writeToHistory(login, value, 3);
+
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
             return false;
@@ -246,6 +247,21 @@ public class ModelController {
             preparedStatementDeleteAccount.executeUpdate();
             return true;
         } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    public boolean writeToHistory(String login, String value, int operationType){
+        try {
+
+            String insertOperationInfo = "insert into operationlist (userid , operationid , operationvalue) values ((select id from users where login = '"+login+"'), "+operationType + ", "+value+");";
+            PreparedStatement preparedStatementDeleteAccount = dbConnector.getDbConnection().prepareStatement(insertOperationInfo);
+            preparedStatementDeleteAccount.executeUpdate();
+
+            return true;
+        }catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
             return false;
         }

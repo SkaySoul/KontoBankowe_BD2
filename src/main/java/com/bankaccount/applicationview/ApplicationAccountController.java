@@ -2,12 +2,24 @@ package com.bankaccount.applicationview;
 
 import com.bankaccount.applicationsource.Account;
 import com.bankaccount.applicationsource.Config;
+import com.bankaccount.applicationsource.OperationHistoryUnit;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Group;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import org.apache.commons.lang3.math.NumberUtils;
 
+import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Objects;
 import java.util.Optional;
 
 public class ApplicationAccountController extends ApplicationRootController {
@@ -69,6 +81,8 @@ public class ApplicationAccountController extends ApplicationRootController {
 
         payinButton.setOnAction(event -> {
             TextInputDialog dialog = new TextInputDialog();
+            Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+            stage.getIcons().add(new Image("https://icons.iconarchive.com/icons/dooffy/characters/256/And-icon.png"));
             dialog.setTitle("Payment transaction");
             dialog.setHeaderText("Please enter value of transaction");
             Optional<String> result = dialog.showAndWait();
@@ -77,7 +91,7 @@ public class ApplicationAccountController extends ApplicationRootController {
                     if (Integer.parseInt(result.get()) <= 0) {
                         createAlertBox("error", "You cant insert values lower than 0");
                     } else {
-                        if (initializeController().makePaymentIn(Integer.parseInt(result.get()), login)) {
+                        if (initializeController().makePaymentIn(result.get(), login)) {
                             createAlertBox("Information", "Transaction was successful!");
                             accountInitialize(login);
                         } else createAlertBox("Error", "Something went wrong, please try again...");
@@ -89,6 +103,8 @@ public class ApplicationAccountController extends ApplicationRootController {
 
         payoutButton.setOnAction(event -> {
             TextInputDialog dialog = new TextInputDialog();
+            Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+            stage.getIcons().add(new Image("https://icons.iconarchive.com/icons/dooffy/characters/256/And-icon.png"));
             dialog.setTitle("Payment transaction");
             dialog.setHeaderText("Please enter value of transaction");
             Optional<String> result = dialog.showAndWait();
@@ -98,7 +114,7 @@ public class ApplicationAccountController extends ApplicationRootController {
                         createAlertBox("error", "You cant insert values lower than 0");
                     } else {
                         if (Float.parseFloat(result.get()) - Float.parseFloat(currentBalanceField.getText().replaceAll("[^0-9?!\\\\.]", "")) < 0) {
-                            if (initializeController().makePaymentOut(Integer.parseInt(result.get()), login)) {
+                            if (initializeController().makePaymentOut(result.get(), login)) {
                                 createAlertBox("Information", "Transaction was successful!");
                                 accountInitialize(login);
                             } else createAlertBox("Error", "Something went wrong, please try again...");
@@ -111,6 +127,8 @@ public class ApplicationAccountController extends ApplicationRootController {
         transferButton.setOnAction(event -> {
             String value = null;
             TextInputDialog dialog = new TextInputDialog();
+            Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+            stage.getIcons().add(new Image("https://icons.iconarchive.com/icons/dooffy/characters/256/And-icon.png"));
             dialog.setTitle("Transfer transaction");
             dialog.setHeaderText("Please enter value of transaction");
             Optional<String> result = dialog.showAndWait();
@@ -127,6 +145,8 @@ public class ApplicationAccountController extends ApplicationRootController {
             } else createAlertBox("error", "You need to insert some value");
 
             TextInputDialog dialog2 = new TextInputDialog();
+            Stage stage2 = (Stage) dialog2.getDialogPane().getScene().getWindow();
+            stage2.getIcons().add(new Image("https://icons.iconarchive.com/icons/dooffy/characters/256/And-icon.png"));
             dialog2.setTitle("Transfer transaction");
             dialog2.setHeaderText("Please enter account number of receiver");
             Optional<String> resultaccnum = dialog2.showAndWait();
@@ -148,7 +168,9 @@ public class ApplicationAccountController extends ApplicationRootController {
 
 
         creditButton.setOnAction(event ->{
-                TextInputDialog dialog = new TextInputDialog();
+            TextInputDialog dialog = new TextInputDialog();
+            Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+            stage.getIcons().add(new Image("https://icons.iconarchive.com/icons/dooffy/characters/256/And-icon.png"));
                 dialog.setTitle("Credit operation");
                 dialog.setHeaderText("Please enter value of operation");
                 Optional<String> result = dialog.showAndWait();
@@ -158,8 +180,8 @@ public class ApplicationAccountController extends ApplicationRootController {
                             createAlertBox("error", "You cant insert values lower than 0");
                         } else {
                             if (Float.parseFloat(result.get()) + Float.parseFloat(creditBalanceField.getText().replaceAll("[^0-9?!\\\\.]", "")) <= Config.maxCreditValue) {
-                                boolean newcreditStatus = Float.parseFloat(result.get()) + Float.parseFloat(creditBalanceField.getText().replaceAll("[^0-9?!\\\\.]", "")) != Config.maxCreditValue;
-                                if (initializeController().makeCredit(result.get(), login, newcreditStatus)) {
+                                boolean newCreditStatus = Float.parseFloat(result.get()) + Float.parseFloat(creditBalanceField.getText().replaceAll("[^0-9?!\\\\.]", "")) != Config.maxCreditValue;
+                                if (initializeController().makeCredit(result.get(), login, newCreditStatus)) {
                                     createAlertBox("Information", "Operation was successful!");
                                     accountInitialize(login);
                                 } else createAlertBox("Error", "Something went wrong, please try again...");
@@ -171,15 +193,52 @@ public class ApplicationAccountController extends ApplicationRootController {
 
             deleteAccountButton.setOnAction(event->{
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure?", ButtonType.YES, ButtonType.NO);
+                Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+                stage.getIcons().add(new Image("https://icons.iconarchive.com/icons/dooffy/characters/256/And-icon.png"));
                 alert.showAndWait();
 
                 if (alert.getResult() == ButtonType.YES) {
-                    initializeController().deleteAccount(login);
-                    openNewScene(event,this,"application-login-screen.fxml");
+                    if(initializeController().deleteAccount(login)){
+                        openNewScene(event,this,"application-login-screen.fxml");
+                        createAlertBox("Information", "Your account successfully deleted!");
+                    }else createAlertBox("error", "Something went wrong, please try again");
+
                 }
 
             });
+
+
+            operationListButton.setOnAction(event->{
+                Account account = initializeController().getAccountInfo(login);
+                FXMLLoader loader = new FXMLLoader();
+                loader.setLocation(Objects.requireNonNull(getClass().getResource("application-operations.fxml")));
+                try {
+                    loader.load();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                ApplicationOperationsController controller = loader.getController();
+                controller.setAccount(account);
+                controller.initData();
+
+                Parent root = loader.getRoot();
+                Stage stage = new Stage();
+                stage.setScene(new Scene(root));
+
+                stage.getIcons().add(new Image("https://icons.iconarchive.com/icons/dooffy/characters/256/And-icon.png"));
+
+                stage.show();
+
+
+            });
+
     }
+
+
+
+
+
 
     public void accountInitialize(String login) {
         Account account = initializeController().getAccountInfo(login);

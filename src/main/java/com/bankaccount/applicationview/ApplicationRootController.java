@@ -37,7 +37,7 @@ public class ApplicationRootController {
         Stage stage = new Stage();
         stage.setScene(new Scene(root));
         stage.getIcons().add(new Image("https://icons.iconarchive.com/icons/dooffy/characters/256/And-icon.png"));
-
+        stage.setTitle("Bank Application");
         stage.show();
         Node node = (Node) event.getSource();
         Stage prevStage = (Stage) node.getScene().getWindow();
