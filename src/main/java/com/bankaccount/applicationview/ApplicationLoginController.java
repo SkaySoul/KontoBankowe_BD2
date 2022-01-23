@@ -44,38 +44,38 @@ public class ApplicationLoginController extends ApplicationRootController {
             String passwordText = passwordField.getText().trim();
 
             if (!loginText.equals("") || !passwordText.equals("")) {
+                if (loginText.length()<20 || passwordText.length()<20) {
+                    try {
+                        if (!initializeController().findAccount(loginText, passwordText)) {
+                            createAlertBox("Error", "Login or password is incorrect, or login is does not exist!");
+                        } else {
+                            FXMLLoader loader = new FXMLLoader();
+                            loader.setLocation(Objects.requireNonNull(getClass().getResource("application-account.fxml")));
+                            try {
+                                loader.load();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            Parent root = loader.getRoot();
+                            Stage stage = new Stage();
+                            stage.setScene(new Scene(root));
 
-                try {
-                    if (!initializeController().findAccount(loginText, passwordText)) {
-                        createAlertBox("Error", "Login or password is incorrect, or login is does not exist!");
-                    } else {
-                        FXMLLoader loader = new FXMLLoader();
-                        loader.setLocation(Objects.requireNonNull(getClass().getResource("application-account.fxml")));
-                        try {
-                            loader.load();
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                            //initializing account values
+                            ApplicationAccountController controller = loader.getController();
+                            controller.setLogin(loginText);
+                            controller.accountInitialize(loginText);
+
+                            stage.getIcons().add(new Image("https://icons.iconarchive.com/icons/dooffy/characters/256/And-icon.png"));
+                            stage.show();
+                            Node node = (Node) event.getSource();
+                            Stage prevStage = (Stage) node.getScene().getWindow();
+                            prevStage.close();
                         }
-                        Parent root = loader.getRoot();
-                        Stage stage = new Stage();
-                        stage.setScene(new Scene(root));
 
-                        //initializing account values
-                        ApplicationAccountController controller = loader.getController();
-                        controller.setLogin(loginText);
-                        controller.accountInitialize(loginText);
-
-                        stage.getIcons().add(new Image("https://icons.iconarchive.com/icons/dooffy/characters/256/And-icon.png"));
-                        stage.show();
-                        Node node = (Node) event.getSource();
-                        Stage prevStage = (Stage) node.getScene().getWindow();
-                        prevStage.close();
+                    } catch (SQLException | ClassNotFoundException e) {
+                        e.printStackTrace();
                     }
-
-                } catch (SQLException | ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-
+                }else createAlertBox("Error", "Login or password cant be bigger than 20 symbols!");
             } else createAlertBox("Error", "Login or password field cant be empty!");
         });
 
