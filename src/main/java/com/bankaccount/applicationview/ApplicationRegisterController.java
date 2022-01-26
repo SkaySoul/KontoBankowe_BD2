@@ -40,7 +40,7 @@ public class ApplicationRegisterController extends ApplicationRootController {
             if (!loginText.equals("") || !passwordText.equals("") || !nameText.equals("") || !surnameText.equals("")) {
                 if (!NumberUtils.isCreatable(nameText) || !NumberUtils.isCreatable(surnameText)) {
                     if (nameText.length() < 20 || surnameText.length() < 20) {
-                        if (loginText.length() < 6 || passwordText.length() < 8) {
+                        if (loginText.length() > 6 || passwordText.length() > 8) {
                             try {
                                 if (initializeController().addNewUser(nameText, surnameText, loginText, passwordText)) {
                                     openNewScene(event, this, "application-login-screen.fxml");
