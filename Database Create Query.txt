@@ -1,0 +1,39 @@
+create database kontobankowe;
+use kontobankowe;
+create table Users(
+id int auto_increment not null primary key,
+login varchar (20) not null unique,
+passwords varchar(20) not null,
+accountnumber varchar(8) not null,
+username varchar(40) not null,
+usersurname varchar(40) not null
+);
+
+create table CreditStatus(
+id int primary key not null auto_increment,
+userid int not null,
+creditbalance float not null,
+creditstatus boolean not null,
+foreign key (userid) references Users (id) on update cascade on delete cascade
+);
+
+create table AccountStatus(
+id int auto_increment not null primary key,
+userid int not null,
+currentbalance float not null,
+foreign key (userid) references Users(id) on update cascade on delete cascade
+);
+
+create table Operations(
+id int not null primary key auto_increment,
+operationtype varchar(40) not null
+);
+
+create table OperationList(
+id int primary key not null auto_increment,
+userid int not null,
+operationid int not null,
+operationvalue int not null,
+foreign key (userid) references Users(id) on update cascade on delete cascade,
+foreign key (operationid) references Operations(id) on update cascade on delete restrict
+);
