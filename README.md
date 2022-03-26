@@ -23,7 +23,7 @@
       - Intellij Idea
       - MySQL Server 8.0
       - Maven
-      - UML (W folderze Dane Projektowe)
+      - UML (W pliku Dane Projektowe.pdf)
       
   ## Uwagi
  W aplikacji można załogować się tylko i wyłącznie jak użytkownik, funkcje administratywne dostępne po stronie administratora bazy danych.
